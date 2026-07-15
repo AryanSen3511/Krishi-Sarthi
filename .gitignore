@@ -1,0 +1,17 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Training datasets
+Disease_dataset/
+Krishi_ai_dataset/
+anaconda_projects/
+
+# Jupyter Notebook
+*.ipynb

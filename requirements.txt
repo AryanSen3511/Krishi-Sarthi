@@ -1,0 +1,16 @@
+# New packages needed for the multilingual voice assistant on the Home page.
+# Install with: pip install -r requirements_voice.txt
+# (Add these to your main requirements.txt alongside streamlit, pandas, etc.)
+
+SpeechRecognition==3.10.4
+gTTS==2.5.1
+audio-recorder-streamlit==0.0.10
+groq==0.9.0
+python-dotenv==1.0.1
+
+# IMPORTANT: httpx>=0.28 removed the 'proxies' argument that the groq
+# (and openai) SDKs still pass internally — this causes:
+#   TypeError: Client.__init__() got an unexpected keyword argument 'proxies'
+# Pinning httpx below 0.28 avoids it. If something else in your project
+# needs a newer httpx, upgrade `groq` to the latest version instead.
+httpx==0.27.2

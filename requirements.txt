@@ -14,3 +14,12 @@ python-dotenv==1.0.1
 # Pinning httpx below 0.28 avoids it. If something else in your project
 # needs a newer httpx, upgrade `groq` to the latest version instead.
 httpx==0.27.2
+
+streamlit
+joblib
+numpy
+pandas
+scikit-learn
+tensorflow
+pillow
+opencv-python-headless

@@ -27,19 +27,17 @@
 
 
 
-streamlit==1.59.2
-
-joblib==1.5.2
-numpy==2.5.1
-pandas==3.0.3
-scikit-learn==1.7.1
+streamlit
+joblib
+numpy
+pandas
+scikit-learn
 tensorflow==2.19.0
-Pillow==12.3.0
-opencv-python-headless==4.12.0.88
-
-SpeechRecognition==3.10.4
-gTTS==2.5.1
-audio-recorder-streamlit==0.0.10
-groq==0.9.0
-python-dotenv==1.0.1
+Pillow
+opencv-python-headless
+SpeechRecognition
+gTTS
+audio-recorder-streamlit
+groq
+python-dotenv
 httpx==0.27.2

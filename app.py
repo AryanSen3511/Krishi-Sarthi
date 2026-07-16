@@ -4832,21 +4832,47 @@ st.markdown("""
 # ================= LOAD DATASET ==========================
 # =========================================================
 
+# DATASET_PATH = "Krishi_ai_dataset/cleaned_crop_dataset.csv"
+
+# @st.cache_data(show_spinner=False)
+# def load_dataset(path):
+#     if not os.path.exists(path):
+#         return None
+#     return pd.read_csv(path)
+
+# df = load_dataset(DATASET_PATH)
+
+# if df is None:
+#     st.error(
+#         f"❌ Dataset not found at `{DATASET_PATH}`. "
+#         "Please add the CSV file and restart."
+#     )
+#     st.stop()
+
+
+import os
+import pandas as pd
+import streamlit as st
+
 DATASET_PATH = "Krishi_ai_dataset/cleaned_crop_dataset.csv"
 
-@st.cache_data(show_spinner=False)
+st.write("Current Directory:", os.getcwd())
+st.write("Root Files:", os.listdir("."))
+
+if os.path.exists("Krishi_ai_dataset"):
+    st.write("Krishi_ai_dataset Files:", os.listdir("Krishi_ai_dataset"))
+else:
+    st.write("❌ Krishi_ai_dataset folder NOT FOUND")
+
+st.write("Dataset Exists:", os.path.exists(DATASET_PATH))
+
+@st.cache_data
 def load_dataset(path):
-    if not os.path.exists(path):
-        return None
     return pd.read_csv(path)
 
-df = load_dataset(DATASET_PATH)
-
-if df is None:
-    st.error(
-        f"❌ Dataset not found at `{DATASET_PATH}`. "
-        "Please add the CSV file and restart."
-    )
+if os.path.exists(DATASET_PATH):
+    df = load_dataset(DATASET_PATH)
+else:
     st.stop()
 
 # =========================================================

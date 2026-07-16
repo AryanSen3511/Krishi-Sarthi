@@ -9,8 +9,8 @@ __pycache__/
 .env
 
 # Training datasets
-Disease_dataset/
-Krishi_ai_dataset/
+# Disease_dataset/
+# Krishi_ai_dataset/
 anaconda_projects/
 
 # Jupyter Notebook

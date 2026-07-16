@@ -4856,23 +4856,17 @@ import streamlit as st
 
 DATASET_PATH = "Krishi_ai_dataset/cleaned_crop_dataset.csv"
 
-st.write("Current Directory:", os.getcwd())
-st.write("Root Files:", os.listdir("."))
-
-if os.path.exists("Krishi_ai_dataset"):
-    st.write("Krishi_ai_dataset Files:", os.listdir("Krishi_ai_dataset"))
-else:
-    st.write("❌ Krishi_ai_dataset folder NOT FOUND")
-
-st.write("Dataset Exists:", os.path.exists(DATASET_PATH))
-
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def load_dataset(path):
     return pd.read_csv(path)
 
-if os.path.exists(DATASET_PATH):
+try:
     df = load_dataset(DATASET_PATH)
-else:
+except FileNotFoundError:
+    st.error(f"❌ Dataset not found at: {DATASET_PATH}")
+    st.stop()
+except Exception as e:
+    st.error(f"❌ Error loading dataset: {e}")
     st.stop()
 
 # =========================================================

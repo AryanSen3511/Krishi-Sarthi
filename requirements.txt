@@ -41,3 +41,4 @@ audio-recorder-streamlit
 groq
 python-dotenv
 httpx==0.27.2
+plotly

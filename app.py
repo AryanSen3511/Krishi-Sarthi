@@ -5334,6 +5334,358 @@ if page == "🏠 Home":
 # PAGE: ANALYTICS
 # =========================================================
 
+# elif page == "📊 Analytics":
+
+#     st.header("📊 Krishi Data Analytics Dashboard")
+
+#     st.subheader("📁 Dataset Overview")
+#     c1, c2, c3, c4, c5 = st.columns(5)
+#     c1.metric("Total Rows",      f"{df.shape[0]:,}")
+#     c2.metric("Total Columns",   df.shape[1])
+#     c3.metric("Unique Crops",    df["label"].nunique())
+#     c4.metric("Duplicate Rows",  int(df.duplicated().sum()))
+#     c5.metric("Missing Values",  int(df.isnull().sum().sum()))
+#     st.markdown("---")
+
+#     st.subheader("🔬 Data Quality Check")
+#     q1, q2 = st.columns(2)
+#     with q1:
+#         st.write("#### Data Types")
+#         dtype_df = df.dtypes.reset_index()
+#         dtype_df.columns = ["Feature", "Type"]
+#         dtype_df["Type"] = dtype_df["Type"].astype(str)
+#         st.dataframe(dtype_df, use_container_width=True)
+#     with q2:
+#         st.write("#### Missing Values")
+#         mv = df.isnull().sum().reset_index()
+#         mv.columns = ["Feature", "Missing"]
+#         st.dataframe(mv, use_container_width=True)
+#         if mv["Missing"].sum() == 0:
+#             st.success("✅ No missing values!")
+#         if df.duplicated().sum() == 0:
+#             st.success("✅ No duplicate rows!")
+#     st.markdown("---")
+
+#     st.subheader("🔍 Dataset Preview")
+#     st.dataframe(df.head(50), use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("📈 Statistical Summary")
+#     st.dataframe(df.describe().round(2), use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("🌾 Crop Distribution")
+#     crop_count = df["label"].value_counts().reset_index()
+#     crop_count.columns = ["Crop", "Count"]
+
+#     d1, d2 = st.columns(2)
+#     with d1:
+#         fig = px.bar(crop_count, x="Crop", y="Count",
+#                      color="Count", color_continuous_scale="Greens",
+#                      text="Count", title="Crop Count")
+#         fig.update_traces(textposition="outside", textfont_color="#1a1a1a")
+#         fig.update_layout(xaxis_tickangle=-45, showlegend=False, height=380)
+#         fig.update_coloraxes(colorbar=colorbar_cfg())
+#         st.plotly_chart(fig, use_container_width=True)
+#     with d2:
+#         fig2 = px.pie(crop_count, names="Crop", values="Count",
+#                       title="Crop Share",
+#                       color_discrete_sequence=px.colors.sequential.Greens_r)
+#         fig2.update_traces(textposition="inside", textinfo="percent+label")
+#         st.plotly_chart(fig2, use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("📊 Feature Category Analysis")
+#     cat_cols = [
+#         ("Nitrogen_Category", "Nitrogen"),
+#         ("Phosphorus_Category", "Phosphorus"),
+#         ("Potassium_Category", "Potassium"),
+#         ("Temperature_Category", "Temperature"),
+#         ("Humidity_Category", "Humidity"),
+#         ("PH_Category", "Soil pH"),
+#         ("Rainfall_Category", "Rainfall"),
+#     ]
+#     ca1, ca2 = st.columns(2)
+#     for i, (col_name, title) in enumerate(cat_cols):
+#         counts = df[col_name].value_counts().reset_index()
+#         counts.columns = ["Category", "Count"]
+#         fig = px.pie(counts, names="Category", values="Count",
+#                      title=f"{title} Distribution", hole=0.4,
+#                      color_discrete_sequence=px.colors.qualitative.Set2)
+#         fig.update_traces(textinfo="percent+label")
+#         (ca1 if i % 2 == 0 else ca2).plotly_chart(fig, use_container_width=True)
+#     st.markdown("---")
+
+#     def climate_bar(feature, label, color_scale, unit=""):
+#         grp = df.groupby("label")[feature].mean().round(2).reset_index()
+#         grp.columns = ["Crop", label]
+#         grp = grp.sort_values(label, ascending=True)
+#         fig = px.bar(grp, x=label, y="Crop", orientation="h",
+#                      title=f"Average {label} per Crop",
+#                      color=label, color_continuous_scale=color_scale,
+#                      text=label)
+#         fig.update_traces(textposition="outside", textfont_color="#1a1a1a")
+#         fig.update_layout(height=580, yaxis_title="")
+#         fig.update_coloraxes(colorbar=colorbar_cfg())
+#         return fig, grp
+
+#     for feat, lbl, scale in [
+#         ("temperature", "Avg Temperature (°C)", "RdYlGn_r"),
+#         ("rainfall",    "Avg Rainfall (mm)",    "Blues"),
+#         ("humidity",    "Avg Humidity (%)",      "Teal"),
+#         ("ph",          "Avg pH",               "RdYlGn"),
+#     ]:
+#         icon = '🌡' if 'Temp' in lbl else '🌧' if 'Rain' in lbl else '💧' if 'Hum' in lbl else '🧪'
+#         st.subheader(f"{icon} {lbl}")
+#         fig, grp = climate_bar(feat, lbl, scale)
+#         st.plotly_chart(fig, use_container_width=True)
+#         t1, t2 = st.columns(2)
+#         with t1:
+#             st.write("**Top 5 (Highest)**")
+#             st.dataframe(grp.tail(5)[::-1].reset_index(drop=True), use_container_width=True)
+#         with t2:
+#             st.write("**Bottom 5 (Lowest)**")
+#             st.dataframe(grp.head(5).reset_index(drop=True), use_container_width=True)
+#         st.markdown("---")
+
+#     st.subheader("🪴 NPK Analysis")
+#     avg_npk = df.groupby("label")[["N","P","K"]].mean().round(2).reset_index()
+#     npk_m   = avg_npk.melt(id_vars="label", value_vars=["N","P","K"],
+#                             var_name="Nutrient", value_name="Value")
+#     cmap = {"N": "#2ca02c", "P": "#ff7f0e", "K": "#1f77b4"}
+
+#     for mode, title in [("group","Grouped"), ("stack","Stacked — shows proportion")]:
+#         fig = px.bar(npk_m, x="label", y="Value", color="Nutrient",
+#                      barmode=mode, title=f"N, P, K per Crop ({title})",
+#                      color_discrete_map=cmap,
+#                      labels={"label":"Crop","Value":"mg/kg"})
+#         fig.update_layout(xaxis_tickangle=-45, height=420)
+#         st.plotly_chart(fig, use_container_width=True)
+#     st.dataframe(avg_npk.set_index("label"), use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("🧪 Soil Health Analysis")
+#     c1,c2,c3 = st.columns(3)
+#     c1.metric("Avg Nitrogen",   round(df["N"].mean(),2))
+#     c2.metric("Avg Phosphorus", round(df["P"].mean(),2))
+#     c3.metric("Avg Potassium",  round(df["K"].mean(),2))
+
+#     soil = df.groupby("label")[["N","P","K"]].mean()
+#     soil["Score"] = soil.mean(axis=1).round(2)
+#     soil = soil.reset_index().sort_values("Score", ascending=False)
+#     avg_s = soil["Score"].mean()
+
+#     fig = px.bar(soil, x="label", y="Score", color="Score",
+#                  color_continuous_scale="YlGn", text="Score",
+#                  title="Soil Health Score (avg of N+P+K)")
+#     fig.add_hline(y=avg_s, line_dash="dash", line_color="red",
+#                   annotation_text=f"Avg: {avg_s:.1f}")
+#     fig.update_traces(textposition="outside", textfont_color="#1a1a1a")
+#     fig.update_layout(xaxis_tickangle=-45, height=420)
+#     fig.update_coloraxes(colorbar=colorbar_cfg())
+#     st.plotly_chart(fig, use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("⚠️ Nutrient Deficiency Flag")
+#     npk_flag = df.groupby("label")[["N","P","K"]].mean().round(2).reset_index()
+#     npk_flag["N_Flag"] = npk_flag["N"].apply(lambda x: "⚠️ Low" if x<=50 else "✅ OK")
+#     npk_flag["P_Flag"] = npk_flag["P"].apply(lambda x: "⚠️ Low" if x<=40 else "✅ OK")
+#     npk_flag["K_Flag"] = npk_flag["K"].apply(lambda x: "⚠️ Low" if x<=40 else "✅ OK")
+#     npk_flag["Status"] = npk_flag[["N_Flag","P_Flag","K_Flag"]].apply(
+#         lambda r: "⚠️ Deficient" if "⚠️ Low" in r.values else "✅ Sufficient", axis=1)
+#     deficient = npk_flag[npk_flag["Status"]=="⚠️ Deficient"]
+#     if len(deficient):
+#         st.warning(f"⚠️ {len(deficient)} crops have a nutrient in the Low range.")
+#         st.dataframe(deficient[["label","N","N_Flag","P","P_Flag","K","K_Flag"]],
+#                      use_container_width=True)
+#     else:
+#         st.success("✅ All crops have sufficient average NPK levels.")
+#     st.markdown("---")
+
+#     st.subheader("📏 Feature Range per Crop")
+#     sel_feat = st.selectbox("Select Feature", NUMERIC_FEATURES, key="range_sel")
+#     range_df = (df.groupby("label")[sel_feat]
+#                 .agg(["min","max","mean","std"]).round(2).reset_index())
+#     range_df.columns = ["Crop","Min","Max","Mean","Std Dev"]
+#     range_df = range_df.sort_values("Mean", ascending=False)
+#     fig = go.Figure(go.Bar(
+#         x=range_df["Crop"], y=range_df["Mean"], name="Mean",
+#         marker_color="#2ca02c",
+#         error_y=dict(type="data", array=range_df["Std Dev"], visible=True),
+#         text=range_df["Mean"], textposition="outside"
+#     ))
+#     fig.update_layout(title=f"{sel_feat} — Mean ± Std Dev",
+#                       xaxis_tickangle=-45, height=440)
+#     st.plotly_chart(fig, use_container_width=True)
+#     st.dataframe(range_df.set_index("Crop"), use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("🔵 Scatter Plot Analysis")
+#     scatter_pairs = [
+#         ("rainfall","humidity","Rainfall vs Humidity"),
+#         ("temperature","ph","Temperature vs Soil pH"),
+#         ("N","K","Nitrogen vs Potassium"),
+#         ("temperature","rainfall","Temperature vs Rainfall"),
+#     ]
+#     s1, s2 = st.columns(2)
+#     for i, (x, y, title) in enumerate(scatter_pairs):
+#         fig = px.scatter(df, x=x, y=y, color="label",
+#                          hover_name="label", title=title, opacity=0.6)
+#         fig.update_layout(height=420, showlegend=False)
+#         (s1 if i % 2 == 0 else s2).plotly_chart(fig, use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("📦 Feature Distribution (Box Plot)")
+#     box_sel = st.selectbox("Select Feature", NUMERIC_FEATURES, key="box_sel")
+#     fig = px.box(df, x="label", y=box_sel, color="label",
+#                  title=f"{box_sel} Distribution by Crop",
+#                  color_discrete_sequence=px.colors.qualitative.Pastel)
+#     fig.update_layout(xaxis_tickangle=-45, height=500, showlegend=False)
+#     st.plotly_chart(fig, use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("📋 Complete Crop Profile")
+#     full_prof = df.groupby("label")[NUMERIC_FEATURES].mean().round(2)
+#     full_prof.columns = ["N (mg/kg)","P (mg/kg)","K (mg/kg)",
+#                          "Temp (°C)","Humidity (%)","pH","Rainfall (mm)"]
+#     st.dataframe(full_prof.style.background_gradient(cmap="YlGn", axis=0),
+#                  use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("⚖️ Crop-to-Crop Comparison")
+#     cc1, cc2 = st.columns(2)
+#     crop_a = cc1.selectbox("Crop A", CROPS_LIST, index=0, key="ca")
+#     crop_b = cc2.selectbox("Crop B", CROPS_LIST, index=1, key="cb")
+
+#     a_v = df[df["label"]==crop_a][NUMERIC_FEATURES].mean().round(2)
+#     b_v = df[df["label"]==crop_b][NUMERIC_FEATURES].mean().round(2)
+
+#     fig = go.Figure([
+#         go.Bar(name=crop_a, x=FEATURE_LABELS, y=a_v.values,
+#                marker_color="#2ca02c", text=a_v.values, textposition="outside"),
+#         go.Bar(name=crop_b, x=FEATURE_LABELS, y=b_v.values,
+#                marker_color="#1f77b4", text=b_v.values, textposition="outside"),
+#     ])
+#     fig.update_layout(barmode="group",
+#                       title=f"{crop_a} vs {crop_b}", height=400)
+#     st.plotly_chart(fig, use_container_width=True)
+
+#     a_n = CROP_NORM.loc[crop_a].values.tolist()
+#     b_n = CROP_NORM.loc[crop_b].values.tolist()
+#     fig2 = go.Figure([
+#         go.Scatterpolar(r=a_n+[a_n[0]], theta=NUMERIC_FEATURES+[NUMERIC_FEATURES[0]],
+#                         fill="toself", name=crop_a,
+#                         line_color="#2ca02c", fillcolor="rgba(44,160,44,0.15)"),
+#         go.Scatterpolar(r=b_n+[b_n[0]], theta=NUMERIC_FEATURES+[NUMERIC_FEATURES[0]],
+#                         fill="toself", name=crop_b,
+#                         line_color="#1f77b4", fillcolor="rgba(31,119,180,0.15)"),
+#     ])
+#     fig2.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0,1])),
+#                        title=f"Radar: {crop_a} vs {crop_b} (Normalized 0–1)", height=460)
+#     st.plotly_chart(fig2, use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("🔍 Similar Crops Finder")
+#     target = st.selectbox("Select a Crop", CROPS_LIST, key="sim")
+#     vec    = CROP_NORM.loc[target]
+#     dists  = CROP_NORM.drop(target).apply(
+#         lambda r: np.sqrt(((r - vec)**2).sum()), axis=1)
+#     top3 = dists.nsmallest(3).reset_index()
+#     top3.columns = ["Similar Crop","Distance (lower=closer)"]
+#     top3["Distance (lower=closer)"] = top3["Distance (lower=closer)"].round(4)
+#     st.write(f"**Top 3 crops most similar to {target}:**")
+#     st.dataframe(top3, use_container_width=True)
+#     sim_names   = top3["Similar Crop"].tolist()
+#     sim_profile = CROP_MEANS.loc[[target]+sim_names].round(2)
+#     st.dataframe(sim_profile.style.background_gradient(cmap="Greens", axis=0),
+#                  use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("🔍 Crop Filter")
+#     sel_crop  = st.selectbox("Select Crop", CROPS_LIST, key="filter")
+#     crop_data = df[df["label"]==sel_crop]
+#     m1,m2,m3,m4 = st.columns(4)
+#     m1.metric("Avg Temp",     f"{crop_data['temperature'].mean():.1f} °C")
+#     m2.metric("Avg Humidity", f"{crop_data['humidity'].mean():.1f} %")
+#     m3.metric("Avg Rainfall", f"{crop_data['rainfall'].mean():.1f} mm")
+#     m4.metric("Avg pH",       f"{crop_data['ph'].mean():.2f}")
+#     n1,n2,n3 = st.columns(3)
+#     n1.metric("Avg Nitrogen",   round(crop_data["N"].mean(),2))
+#     n2.metric("Avg Phosphorus", round(crop_data["P"].mean(),2))
+#     n3.metric("Avg Potassium",  round(crop_data["K"].mean(),2))
+#     st.dataframe(crop_data, use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("🔗 Feature Correlation Matrix")
+#     corr = df[NUMERIC_FEATURES].corr().round(3)
+#     fig  = px.imshow(corr, text_auto=True, color_continuous_scale="RdYlGn",
+#                      zmin=-1, zmax=1, title="Feature Correlation Heatmap")
+#     fig.update_layout(height=480)
+#     fig.update_coloraxes(colorbar=colorbar_cfg())
+#     st.plotly_chart(fig, use_container_width=True)
+#     st.caption("🟢 Green = positive | 🔴 Red = negative | ⚪ White = no correlation")
+
+#     pairs = corr.unstack().reset_index()
+#     pairs.columns = ["Feature A","Feature B","Correlation"]
+#     pairs = pairs[pairs["Feature A"] < pairs["Feature B"]]
+#     pairs["Abs"] = pairs["Correlation"].abs()
+#     pairs = pairs.sort_values("Abs", ascending=False).drop(columns="Abs")
+#     pc1, pc2 = st.columns(2)
+#     with pc1:
+#         st.write("**Top 3 Positive**")
+#         st.dataframe(pairs[pairs["Correlation"]>0].head(3).reset_index(drop=True),
+#                      use_container_width=True)
+#     with pc2:
+#         st.write("**Top 3 Negative**")
+#         st.dataframe(pairs[pairs["Correlation"]<0].head(3).reset_index(drop=True),
+#                      use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("📘 Feature Meaning")
+#     feat_info = pd.DataFrame({
+#         "Feature": ["N","P","K","temperature","humidity","ph","rainfall"],
+#         "Meaning": [
+#             "Nitrogen — leaf and stem growth",
+#             "Phosphorus — root and flower growth",
+#             "Potassium — plant strength and disease resistance",
+#             "Temperature — optimal growing temperature",
+#             "Humidity — moisture level in the air",
+#             "Soil pH — acidity or alkalinity",
+#             "Rainfall — water requirement"
+#         ],
+#         "Unit": ["mg/kg","mg/kg","mg/kg","°C","%","0–14","mm"]
+#     })
+#     st.dataframe(feat_info, use_container_width=True)
+#     st.markdown("---")
+
+#     st.subheader("🌱 Farmer Understanding Guide")
+#     g1, g2 = st.columns(2)
+#     with g1:
+#         st.success("🟢 **Low Nitrogen (≤50)** → Light fertilizer needed")
+#         st.info("🔵 **Medium Nitrogen (51–120)** → Balanced fertilizer")
+#         st.warning("🟡 **High Nitrogen (>120)** → Heavy fertilizer needed")
+#         st.success("🟢 **Cool (≤20°C)** → Wheat, lentil, chickpea")
+#         st.info("🔵 **Moderate (21–30°C)** → Most common crops")
+#         st.warning("🟡 **Hot (>30°C)** → Tropical/summer crops")
+#     with g2:
+#         st.success("🟢 **Acidic (pH<6)** → Tea, rice, blueberry")
+#         st.info("🔵 **Neutral (pH 6–7.5)** → Best for most crops")
+#         st.warning("🟡 **Alkaline (pH>7.5)** → Cotton, maize")
+#         st.success("🟢 **Low Rainfall (≤100mm)** → Drought-tolerant crops")
+#         st.info("🔵 **Medium Rainfall (101–200mm)** → General crops")
+#         st.warning("🟡 **High Rainfall (>200mm)** → Water-intensive crops")
+#     st.markdown("---")
+
+#     st.subheader("📌 Key Insights")
+#     st.success("✅ Dataset is balanced with nearly equal crop distribution.")
+#     st.success("✅ No missing values or duplicate rows found.")
+#     st.success("✅ Dataset is clean and ready for ML model training.")
+#     st.info("📊 Rainfall, temperature, humidity and soil nutrients drive crop suitability.")
+#     st.info("🌱 Rice and jute need high humidity & rainfall; chickpea and kidney beans prefer dry conditions.")
+#     st.info("🧪 Use Scatter and Box Plots to identify natural clusters for ML feature selection.")
+#     st.info("⚖️ Use Crop Comparison and Similar Crops to help farmers choose alternative crops.")
+
+
 elif page == "📊 Analytics":
 
     st.header("📊 Krishi Data Analytics Dashboard")
@@ -5548,8 +5900,9 @@ elif page == "📊 Analytics":
     full_prof = df.groupby("label")[NUMERIC_FEATURES].mean().round(2)
     full_prof.columns = ["N (mg/kg)","P (mg/kg)","K (mg/kg)",
                          "Temp (°C)","Humidity (%)","pH","Rainfall (mm)"]
-    st.dataframe(full_prof.style.background_gradient(cmap="YlGn", axis=0),
-                 use_container_width=True)
+    # FIX: .style.background_gradient() requires matplotlib, which caused the ImportError.
+    # Replaced with a plain dataframe render (no styling dependency).
+    st.dataframe(full_prof, use_container_width=True)
     st.markdown("---")
 
     st.subheader("⚖️ Crop-to-Crop Comparison")
@@ -5597,8 +5950,9 @@ elif page == "📊 Analytics":
     st.dataframe(top3, use_container_width=True)
     sim_names   = top3["Similar Crop"].tolist()
     sim_profile = CROP_MEANS.loc[[target]+sim_names].round(2)
-    st.dataframe(sim_profile.style.background_gradient(cmap="Greens", axis=0),
-                 use_container_width=True)
+    # FIX: same matplotlib-dependent styling removed here too, for consistency
+    # (this call would throw the identical ImportError if left in place).
+    st.dataframe(sim_profile, use_container_width=True)
     st.markdown("---")
 
     st.subheader("🔍 Crop Filter")
